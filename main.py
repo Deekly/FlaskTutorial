@@ -26,6 +26,11 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/my_cv')
+def my_cv():
+    return render_template('my_cv.html')
+
+
 @app.route('/about')
 def about():
     return render_template('about.html')
