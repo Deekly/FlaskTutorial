@@ -1,0 +1,17 @@
+{% extends 'schablon.html' %}
+
+{% block title %}
+Create Article Page
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>Add article</h1>
+    <form method="post">
+        <input type="text" name="title" id="title" class="form-control" placeholder="Enter title"><br>
+        <textarea name="intro" id="intro" class="form-control" placeholder="Enter intro"></textarea><br>
+        <textarea name="text" id="text" class="form-control" placeholder="main text"></textarea><br>
+        <input type="submit" class="btn btn-success" value="Suuubmit"><br>
+    </form>
+</div>
+{% endblock %}

@@ -1,12 +1,12 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, url_for, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 app = Flask(__name__)
-
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
 
 db = SQLAlchemy(app)
+
 
 class Article(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -16,8 +16,12 @@ class Article(db.Model):
     date = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
-        return'<Article %r>' % self.id
+        return '<Article %r>' % self.id
 
+# DONT TOUCH IT. I SPENT TWO DAYS ON THIS
+# creates new db
+with app.app_context():
+    db.create_all()
 
 
 @app.route('/')
@@ -36,10 +40,37 @@ def about():
     return render_template('about.html')
 
 
-@app.route('/user/<string:name>/<int:id>')
-def user(name, id):
-    return "User - " + name + ', id - ' + str(id)
+@app.route('/posts')
+def posts():
+    articles = Article.query.order_by(Article.date.desc()).all()
+    return render_template('posts.html', articles=articles)
+
+
+@app.route('/posts/<int:id>')
+def posts_read_all(id):
+    article = Article.query.get(id)
+    return render_template('post_detail.html', article=article)
+
+
+@app.route('/create_article', methods=['POST', 'GET'])
+def create_article():
+    if request.method == 'POST':
+        title = request.form['title']
+        intro = request.form['intro']
+        text = request.form['text']
+
+        article = Article(title=title, intro=intro, text=text)
+
+        try:
+            db.session.add(article)
+            db.session.commit()
+            return redirect('/posts')
+        except:
+            return 'Try/Except error: error adding article in database'
+
+    else:
+        return render_template('create-article.html')
 
 
 if __name__ == '__main__':
-    app.run(debug = True)
+    app.run(debug=True)
